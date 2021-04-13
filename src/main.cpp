@@ -3,6 +3,7 @@
 #include <string>
 #include <stack>
 #include <list>
+#include <queue>
 
 std::vector<int> reOrderArray(std::vector<int> &array)
 {
@@ -272,6 +273,134 @@ bool IsPopOrder(std::vector<int> pushV,std::vector<int> popV)
         }
     }
     return vStack.empty();
+}
+
+std::vector<int> PrintFromTopToBottom(TreeNode* root) {
+    std::vector<int> result;
+    if (root == nullptr) {
+        return result;
+    }
+    std::queue<TreeNode*> nodeQue;
+    TreeNode* cur = nullptr;
+    nodeQue.push(root);
+    while(!nodeQue.empty()) {
+        result.push_back(nodeQue.front()->val);
+        cur = nodeQue.front();
+        nodeQue.pop();
+        if (cur->left != nullptr) {
+            nodeQue.push(cur->left);
+        }
+        if (cur->right != nullptr) {
+            nodeQue.push(cur->right);
+        }
+    }
+    return result;
+}
+
+TreeNode* reConstructBinaryTree(std::vector<int> vin, std::vector<int> sequence, bool& ret)
+{
+    if (ret == false) {
+        return nullptr;
+    }
+    if (vin.size() != sequence.size()) {
+        ret = false;
+        return nullptr;
+    }
+    if (vin.size() == 0 || sequence.size() == 0)
+        return nullptr; 
+
+    std::vector<int> preVin, lastVin;
+    std::vector<int> preSeq, lastSeq;
+    std::vector<int>::iterator curSeq = sequence.begin();
+    auto root = new TreeNode(*(sequence.end() - 1));
+    bool flag = false;
+    for (auto iter : vin) {
+        if (iter == *(sequence.end() - 1)) {
+            flag = true;
+            continue;
+        }
+        if (flag) {
+            lastVin.push_back(iter);
+            lastSeq.push_back(curSeq++);
+        }
+        else {
+            preVin.push_back(iter);
+            preSeq.push_back(curSeq++);
+        }
+    }
+    if (flag == false) {
+        ret = false
+        return nullptr;
+    }
+    root->left = reConstructBinaryTree(preVin, preSeq, ret);
+    root->right = reConstructBinaryTree(lastVin, lastSeq, ret);
+    return root;
+}
+
+bool VerifySquenceOfBST(std::vector<int> sequence) {
+    if (sequence.size() == 0) {
+        return false;
+    }
+    std::vector<int> vin(sequence);
+    std::sort(vin.begin(), vin.end());
+    bool ret = true;
+    reConstructBinaryTree(vin, sequence, ret);
+    return ret;
+}
+
+std::vector<std::vector<int> > FindPath(TreeNode* root,int expectNumber) {
+    std::vector<std::vector<int>> retArray;
+    std::vector<int> pathArray(10);
+    std::stack<TreeNode*> nodeStack;
+    std::stack<int> lenStack;
+    nodeStack.push(root);
+    int pathLen = 0;
+    lenStack.push(pathLen);
+    while(!nodeStack.empty()) {
+        TreeNode* curNode = nodeStack.top();
+        int curLen = lenStack.top();
+        if (pathArray.capacity() == curLen - 1) {
+            pathArray.resize(pathArray.capacity() * 2);
+        }
+        pathArray[curLen] = curNode->val;
+        nodeStack.pop();
+        lenStack.pop();
+        if (curNode->right || curNode->left) {
+            curLen++;
+        }
+        if (curNode->right) {
+            nodeStack.push(curNode->right);
+            lenStack.push(curLen);
+        }
+        if (curNode->left) {
+            nodeStack.push(curNode->left);
+            lenStack.push(curLen);
+        }
+        if (curNode->right == nullptr && curNode->left == nullptr) {
+            int sum = 0;
+            for (int i = 0; i <= curLen; i++)
+            {
+                sum = sum + pathArray[i];
+            }
+            if (sum == expectNumber) {
+                std::vector<int> temp(pathArray.begin(), pathArray.begin() + curLen + 1);
+                retArray.push_back(temp);
+            }
+        }
+    }
+    return retArray;
+}
+
+struct RandomListNode {
+    int label;
+    struct RandomListNode *next, *random;
+    RandomListNode(int x) :
+            label(x), next(NULL), random(NULL) {
+    }
+};
+
+RandomListNode* Clone(RandomListNode* pHead) {
+    
 }
 
 int main()
