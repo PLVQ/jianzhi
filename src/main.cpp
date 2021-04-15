@@ -4,6 +4,7 @@
 #include <stack>
 #include <list>
 #include <queue>
+#include <algorithm>
 
 std::vector<int> reOrderArray(std::vector<int> &array)
 {
@@ -321,15 +322,15 @@ TreeNode* reConstructBinaryTree(std::vector<int> vin, std::vector<int> sequence,
         }
         if (flag) {
             lastVin.push_back(iter);
-            lastSeq.push_back(curSeq++);
+            lastSeq.push_back(*curSeq++);
         }
         else {
             preVin.push_back(iter);
-            preSeq.push_back(curSeq++);
+            preSeq.push_back(*curSeq++);
         }
     }
     if (flag == false) {
-        ret = false
+        ret = false;
         return nullptr;
     }
     root->left = reConstructBinaryTree(preVin, preSeq, ret);
@@ -400,7 +401,166 @@ struct RandomListNode {
 };
 
 RandomListNode* Clone(RandomListNode* pHead) {
-    
+    if (pHead == nullptr) {
+        return nullptr;
+    }
+    auto pCur = pHead;
+    while(pCur) {
+        RandomListNode* newNode = new RandomListNode(pCur->label);
+        newNode->next = pCur->next;
+        newNode->random = pCur->random;
+        pCur->next = newNode;
+        pCur = newNode->next;
+    }
+    auto pNewHead = pHead->next;
+    do {
+        if (pNewHead->random != nullptr)
+            pNewHead->random = pNewHead->random->next;
+        pNewHead = pNewHead->next;
+        if (pNewHead!=nullptr)
+            pNewHead = pNewHead->next;
+    }while(pNewHead);
+
+    pNewHead = pHead->next;
+    pCur = pHead;
+    auto pNewCur = pHead->next;
+    while(pCur) {
+        pNewCur = pCur->next;
+        pCur->next = pNewCur->next;
+        pCur = pNewCur->next;
+        if (pCur) {
+            pNewCur->next = pCur->next;
+        }
+    }
+    return pNewHead;
+}
+
+TreeNode* orderTra(TreeNode* pRootOfTree, std::vector<TreeNode*>& result) {
+    if (pRootOfTree == nullptr){
+        return nullptr;
+    }
+    orderTra(pRootOfTree->left, result);
+    result.push_back(pRootOfTree);
+    orderTra(pRootOfTree->right, result);
+    return pRootOfTree;
+}
+
+TreeNode* Convert(TreeNode* pRootOfTree) {
+    if (pRootOfTree == nullptr){
+        return nullptr;
+    }
+    std::vector<TreeNode*> result;
+    orderTra(pRootOfTree, result);
+ 
+
+    for (int i = 1; i < result.size()-1; ++i) {
+        result[i]->left = result[i-1];
+        result[i]->right = result[i+1];
+    }
+    return result[0];
+}
+int count = 0;
+void Perm(int start, int end, int a[]) {
+    //得到全排列的一种情况，输出结果
+    if (start == end) {
+        for (int i = 0; i < end; i++)
+            std::cout << a[i] << ' ';
+        std::cout << std::endl;
+        count++;
+        return;
+    }
+    for (int i = start; i < end; i++) {
+        if (i>0 && a[i] == a[i-1])
+            continue;
+        std::swap(a[start], a[i]);      //交换
+        Perm(start + 1, end, a);   //分解为子问题a[start+1,...,end-1]的全排列
+        std::swap(a[i], a[start]);      //回溯
+    }
+}
+
+bool is_swap(std::string& str, int begin, int k)
+{
+    for (int i = begin; i < k; ++i)
+    {
+        if (str[i] == str[k]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void StrPerm(int start, int end, std::string str, std::vector<std::string>& result)
+{
+    if (start == end-1) {
+            printf("%s\n", str.c_str());
+            result.push_back(str);
+    }
+    for (int i = start; i < end; ++i){
+        if (is_swap(str, start, i)) {
+            std::swap(str[start], str[i]);
+            StrPerm(start+1, end, str, result);
+            std::swap(str[i], str[start]);
+        }
+    }
+}
+
+std::vector<std::string> Permutation(std::string str) {
+    std::vector<std::string> result;
+    StrPerm(0, str.length(), str, result);
+    // std::sort(result.begin(), result.end());
+    return result;
+}
+
+void MoreThanHalfNum_Solution(std::vector<int>& numbers, int start, int end, int k) {
+    if (start>=end){
+        return ;
+    }
+    int pHead = start;
+    int pTail = end;
+    int temp = numbers[pTail];
+    while(pHead < pTail){
+        while(pHead < pTail && numbers[pHead] <= temp){
+            pHead++;
+        }
+        if(pHead < pTail && numbers[pHead] > temp){
+            numbers[pTail] = numbers[pHead];
+        }
+        while(pHead < pTail && numbers[pTail] >= temp){
+            pTail--;
+        }
+        if(pHead < pTail && numbers[pTail] < temp){
+            numbers[pHead] = numbers[pTail];
+        }
+    }
+    numbers[pHead] = temp;
+    if (pHead > k)
+        MoreThanHalfNum_Solution(numbers, start, pHead-1, k);
+    else if (pHead < k)
+        MoreThanHalfNum_Solution(numbers, pTail+1, end, k);
+    else
+        return;
+}
+
+std::vector<int> GetLeastNumbers_Solution(std::vector<int> input, int k) {
+    MoreThanHalfNum_Solution(input, 0, input.size() - 1, k);
+    return std::vector<int>(input.begin(), input.begin() + k);
+}
+
+int FindGreatestSumOfSubArray(std::vector<int> array) {
+    if (array.empty())
+        return 0;
+    int maxSum = array[0];
+    int sum = 0;
+    for(int i = 0; i < array.size(); ++i) {
+        sum = sum + array[i];
+        if (sum > maxSum) {
+            maxSum = sum;
+        }
+        if (sum < 0) {
+            sum = 0;
+        }
+    }
+    return maxSum;
 }
 
 int main()
@@ -430,8 +590,23 @@ int main()
     // pop();
     // std::cout << min() << std::endl;
     // std::cout << top() << std::endl;
-    std::vector<int> pushV = {1,2,3,4,5};
-    std::vector<int> popV = {4,3,5,1,2};
-    std::cout << IsPopOrder(pushV, popV) << std::endl;
+    // std::vector<int> pushV = {1,2,3,4,5};
+    // std::vector<int> popV = {4,3,5,1,2,3,5,6,8,9,7,2};
+    // MoreThanHalfNum_Solution(popV, 0, popV.size()-1);
+    // for (auto iter : popV) {
+    //     printf("%d,", iter);
+    // }
+    // printf("\n");
+    // int a[] = {1,2,3,4,4};
+    // Perm(0,5,a);
+    // printf("%d\n", count);
+    // std::cout << IsPopOrder(pushV, popV) << std::endl;
+    // std::string str = "abb";
+    // auto result = Permutation(str);
+    // for (auto iter : result){
+    //     printf("%s\n", iter.c_str());
+    // }
+    std::vector<int> input = {1,-2,3,10,-4,7,2,-5};
+    printf("%d\n", FindGreatestSumOfSubArray(input));
     return 0;
 }
