@@ -681,9 +681,82 @@ int FirstNotRepeatingChar(std::string str) {
     return -1;
 }
 
+int GetUglyNumber_Solution(int index) {
+    std::vector<int> uglyNumber;
+    uglyNumber.push_back(1);
+    int pTow = 0;
+    int pThree = 0;
+    int pFive = 0;
+    while(true) {
+        int minUglyNum = 0;
+        for (int i = pTow; i < uglyNumber.size(); ++i) {
+            if (uglyNumber[i]*2 > uglyNumber[uglyNumber.size()-1]) {
+                pTow = i;
+                minUglyNum = uglyNumber[i]*2;
+                break;
+            }
+        }
+
+        for (int i = pThree; i < uglyNumber.size(); ++i) {
+            if (uglyNumber[i]*3 > uglyNumber[uglyNumber.size()-1]) {
+                if (uglyNumber[i]*3 < minUglyNum) {
+                    pThree = i;
+                    minUglyNum = uglyNumber[i]*3;
+                }
+                break;
+            }
+        }
+
+        for (int i = pFive; i < uglyNumber.size(); ++i) {
+            if (uglyNumber[i]*5 > uglyNumber[uglyNumber.size()-1]) {
+                if (uglyNumber[i]*5 < minUglyNum) {
+                    pFive = i;
+                    minUglyNum = uglyNumber[i]*5;
+                }
+                break;
+            }
+        }
+        uglyNumber.push_back(minUglyNum);
+        if (uglyNumber.size() >= index) {
+            return uglyNumber[index-1];
+        }
+    }
+    return 0;
+}
+
+int InversePairs(std::vector<int> data) {
+    int end = data.size()-1; 
+    int count = 0;
+    for (; end >= 0; --end) {
+        for (int i = 0; i < end; ++i) {
+            if (data[i] > data[end]) {
+                count++;
+                if (count > 1000000007)
+                    count = count%1000000007;
+            }
+        }
+    }
+    return count;
+}
+
+void test() {
+    std::vector<int> vec;
+    vec.push_back(1);
+    vec.push_back(2);
+    for (auto iter : vec) {
+        printf("%d ", iter);
+        if (iter == 2) {
+            vec.push_back(3);
+        }
+    }
+    for (auto iter : vec) {
+        printf("%d ", iter);
+    }
+}
+
 int main()
 {
-    std::vector<int> input = {3,5,1,4,2};
+    std::vector<int> input = {1,2,3,4,5,6,7,0};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -729,7 +802,10 @@ int main()
     // printf("%d\n", MoreThanHalfNum_Solution(input));
     // PrintMinNumber(input);
 
-    printf("%d\n", FirstNotRepeatingChar("google"));
+    // printf("%d\n", FirstNotRepeatingChar("google"));
 
+    // test();
+    // printf("%d", GetUglyNumber_Solution(7));
+    printf("%d", InversePairs(input));
     return 0;
 }
