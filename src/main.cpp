@@ -5,6 +5,10 @@
 #include <list>
 #include <queue>
 #include <algorithm>
+#include <memory>
+#include <string.h>
+
+#include <stdio.h>
 
 std::vector<int> reOrderArray(std::vector<int> &array)
 {
@@ -563,8 +567,123 @@ int FindGreatestSumOfSubArray(std::vector<int> array) {
     return maxSum;
 }
 
+int MoreThanHalfNum_Solution(std::vector<int> numbers) {
+    if (numbers.empty()) {
+        return 0;
+    }
+    int count = 1;
+    int number = numbers[0];
+    for (int i = 1; i < numbers.size(); ++i) {
+        if (count == 0) {
+            number = numbers[i];
+        }
+        if (numbers[i] == number) {
+            count++;
+        }
+        else {
+            count--;
+        }
+    }
+    int nums = 0;
+    for (auto iter : numbers) {
+        if (iter == number) {
+            nums++;
+        }
+    }
+    if (nums > numbers.size()/2) {
+        return number;
+    }
+    else {
+        return 0;
+    }
+}
+
+// 输入一个整数 n ，求1～n这n个整数的十进制表示中1出现的次数
+int NumberOf1Between1AndN_Solution(int n) {
+    int iBit = 1;
+    int iExtral = n%10;
+    int iNum = n/10;
+    int iRet = 0;
+    int iLow = 0;
+    while(iNum != 0 && iExtral != 0) {
+        if (iExtral == 0) {
+            iRet += iNum*iBit;
+        }
+        else if (iExtral == 1) {
+            iRet += iNum*iBit + iLow + 1; 
+        }
+        else {
+            iRet += (iNum + 1)*iBit;
+        }
+
+        iLow += iExtral*iBit;
+        iExtral = iNum%10;
+        iNum = iNum/10;
+        iBit = iBit*10;
+    }
+    return iRet;
+}
+
+bool IntAndStrCompare(std::vector<int> numbers, std::string& result) 
+{
+    std::string str = "";
+    for(auto iter : numbers) {
+        str += std::to_string(iter);
+    }
+    printf("%s, %s\n", str.c_str(), result.c_str());
+    if (result.empty()) {
+        result = str;
+        return true;
+    }
+    else if (str < result) {
+        result = str;
+        return true;
+    }
+    return false;
+}
+
+void numPrem(std::vector<int> numbers, std::string& result, int start)
+{
+    if (start == numbers.size() - 1) {
+        IntAndStrCompare(numbers, result);
+    }
+    for (int i = start; i < numbers.size(); ++i) {
+        std::swap(numbers[start], numbers[i]);
+        if (!IntAndStrCompare(numbers, result)) {
+            std::swap(numbers[i], numbers[start]);
+            continue;
+        }
+        numPrem(numbers, result, start+1);
+        std::swap(numbers[i], numbers[start]);
+    }
+}
+
+std::string PrintMinNumber(std::vector<int> numbers) {
+    std::string result;
+    numPrem(numbers, result, 0);
+    return result;
+}
+
+int FirstNotRepeatingChar(std::string str) {
+    int* nums = new int[129];
+    memset(nums, 0, 129);
+    for (int i = 0; i < str.size(); ++i) {
+        int ascNum = str[i];
+        printf("%d ", ascNum);
+        nums[ascNum] += 1;
+    }
+    for (int i = 0; i < str.size(); ++i) {
+        int ascNum = str[i];
+        if (nums[ascNum] == 1) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 int main()
 {
+    std::vector<int> input = {3,5,1,4,2};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -606,7 +725,11 @@ int main()
     // for (auto iter : result){
     //     printf("%s\n", iter.c_str());
     // }
-    std::vector<int> input = {1,-2,3,10,-4,7,2,-5};
-    printf("%d\n", FindGreatestSumOfSubArray(input));
+    // printf("%d\n", FindGreatestSumOfSubArray(input));
+    // printf("%d\n", MoreThanHalfNum_Solution(input));
+    // PrintMinNumber(input);
+
+    printf("%d\n", FirstNotRepeatingChar("google"));
+
     return 0;
 }
