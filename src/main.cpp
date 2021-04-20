@@ -739,6 +739,50 @@ int InversePairs(std::vector<int> data) {
     return count;
 }
 
+// int count = 0;
+void Merge(std::vector<int>& numbers, int start, int mid, int end)
+{
+    int i = start;
+    int j = mid + 1;
+    std::vector<int> temp;
+    while(i <= mid && j <= end) {
+        if (numbers[i] > numbers[j]) {
+            count += mid - i + 1;
+            temp.push_back(numbers[j]);
+            j++;
+        }
+        else {
+            temp.push_back(numbers[i]);
+            i++;
+        }
+    }
+    while(i <= mid) {
+        temp.push_back(numbers[i]);
+        i++;
+    }
+    while(j <= end) {
+        temp.push_back(numbers[j]);
+        j++;
+    }
+    for (int k = start, iter = 0; k <= end; ++k, ++iter) {
+        numbers[k] = temp[iter];
+    }
+}
+
+void MergeSort(std::vector<int>& numbers, int start, int end)
+{
+    if (numbers.size() == 0) {
+        return ;
+    }
+    if (start < end) {
+        int mid = (start + end)/2;
+        MergeSort(numbers, start, mid);
+        MergeSort(numbers, mid+1, end);
+        Merge(numbers, start, mid, end);
+    }
+
+}
+
 void test() {
     std::vector<int> vec;
     vec.push_back(1);
@@ -756,7 +800,7 @@ void test() {
 
 int main()
 {
-    std::vector<int> input = {1,2,3,4,5,6,7,0};
+    std::vector<int> input = {7,6,5,4,3,2,1};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -806,6 +850,12 @@ int main()
 
     // test();
     // printf("%d", GetUglyNumber_Solution(7));
-    printf("%d", InversePairs(input));
+    printf("%d\n", InversePairs(input));
+    MergeSort(input, 0, input.size()-1);
+    printf("%d\n", count);
+    for (auto iter : input) {
+        printf("%d ", iter);
+    }
+    printf("\n");
     return 0;
 }
