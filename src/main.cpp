@@ -783,6 +783,46 @@ void MergeSort(std::vector<int>& numbers, int start, int end)
 
 }
 
+// 输入两个链表，找出它们的第一个公共结点。
+ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
+    int len1 = 0;
+    int len2 = 0;
+    int len = 0;
+    ListNode* pCur1 = pHead1;
+    ListNode* pCur2 = pHead2;
+    while(pCur1 || pCur2) {
+        if (pCur1) {
+            len1++;
+            pCur1=pCur1->next;
+        }
+        if (pCur2) {
+            len2++;
+            pCur2 = pCur2->next;
+        }
+    }
+    if (len1 > len2) {
+        pCur1 = pHead1;
+        pCur2 = pHead2;
+        len = len1 -len2;
+    }
+    else {
+        pCur1 = pHead2;
+        pCur2 = pHead1;
+        len = len2 -len1;
+    }
+    for(int i = 0; i < len; ++i) {
+        pCur1 = pCur1->next;
+    }
+    while(pCur1&&pCur2) {
+        if (pCur1 == pCur2) {
+            return pCur1;
+        }
+        pCur1 = pCur1->next;
+        pCur2 = pCur2->next;
+    }
+    return pCur2;
+}
+
 void test() {
     std::vector<int> vec;
     vec.push_back(1);
