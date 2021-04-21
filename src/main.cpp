@@ -823,6 +823,102 @@ ListNode* FindFirstCommonNode( ListNode* pHead1, ListNode* pHead2) {
     return pCur2;
 }
 
+// 统计一个数字在升序数组中出现的次数
+int GetNumberOfK(std::vector<int> data ,int k) {
+    if (data.size() == 0) {
+        return 0;
+    }
+    int start = 0;
+    int end = data.size();
+    int count = 0;
+    while(start <= end) {
+        int mid = (start+end)/2;
+        if (k < data[mid]) {
+            end = mid - 1;
+        }
+        else if (k > data[mid]) {
+            start = mid + 1;
+        }
+        else {
+            start = mid-1;
+            end = mid+1;
+            count++;
+            break;
+        } 
+    }
+    if (count>0) {
+        while(start >= 0 || end < data.size()) {
+            if (start >= 0 && data[start--] == k) {
+                count++;
+            }
+            if (end < data.size() && data[end++]== k) {
+                count++;
+            }
+            if (data[start] != k && data[end] !=k){
+                break;
+            }
+        }
+    }
+    return count;
+}
+
+// 输入一棵二叉树，求该树的深度
+int TreeDepth(TreeNode* pRoot, bool& flag) {
+    if (pRoot == nullptr || flag == false) {
+        return 0;
+    }
+    int lDepth = 1 + TreeDepth(pRoot->left, flag);
+    int rDepth = 1 + TreeDepth(pRoot->right, flag);
+    if (lDepth > rDepth) {
+        if (lDepth - rDepth > 1) {
+            flag = false;
+        }
+        return lDepth;
+    }
+    else {
+        if (rDepth - lDepth > 1) {
+            flag = false;
+        }
+        return rDepth;
+    }
+}
+
+// 输入一棵二叉树，判断该二叉树是否是平衡二叉树
+bool IsBalanced_Solution(TreeNode* pRoot) {
+    if (pRoot == nullptr) {
+        return true;
+    }
+    bool flag = true;
+    TreeDepth(pRoot, flag);
+    return flag;
+}
+
+void funFind(std::vector<int> result, int num, int curSum, int sum) {
+    for (int i = num; curSum < sum; ++i) {
+        curSum += i;
+        result.push_back(i);
+    }
+}
+
+std::vector<std::vector<int> > FindContinuousSequence(int sum) {
+    std::vector<std::vector<int>> rResult; 
+    int mid = (sum+1)/2;
+    for (int i = 1; i < mid; ++i) {
+        int curSum = 0;
+        std::vector<int> result;
+        for (int j = i; curSum < sum; ++j) {
+            curSum += j;
+            result.push_back(j);
+            if (sum - curSum <= j)
+                break;
+        }
+        if (curSum == sum) {
+            rResult.push_back(result);
+        }
+    }
+    return rResult;
+}
+
 void test() {
     std::vector<int> vec;
     vec.push_back(1);
@@ -840,7 +936,7 @@ void test() {
 
 int main()
 {
-    std::vector<int> input = {7,6,5,4,3,2,1};
+    std::vector<int> input = {3,3,3,3,4,5};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -890,9 +986,11 @@ int main()
 
     // test();
     // printf("%d", GetUglyNumber_Solution(7));
-    printf("%d\n", InversePairs(input));
-    MergeSort(input, 0, input.size()-1);
-    printf("%d\n", count);
+    // printf("%d\n", InversePairs(input));
+    // MergeSort(input, 0, input.size()-1);
+    // printf("%d\n", count);
+    printf("%d\n", GetNumberOfK(input, 3));
+
     for (auto iter : input) {
         printf("%d ", iter);
     }
