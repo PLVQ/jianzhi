@@ -893,13 +893,42 @@ bool IsBalanced_Solution(TreeNode* pRoot) {
     return flag;
 }
 
-void funFind(std::vector<int> result, int num, int curSum, int sum) {
-    for (int i = num; curSum < sum; ++i) {
-        curSum += i;
-        result.push_back(i);
+// 一个整型数组里除了两个数字只出现一次，其他的数字都出现了两次。请写程序找出这两个只出现一次的数字
+std::vector<int> FindNumsAppearOnce(std::vector<int>& array) {
+    int iResult = 0;
+    for (auto iter : array) {
+        iResult ^= iter;
     }
+    int iIndex = 1;
+    while(iResult > 0) {
+        if ((iResult >> iIndex)%2 == 1) {
+            break;
+        }
+        iIndex++;
+    }
+
+    int iNum1 = 0;
+    int iNum2 = 0;
+    for (auto iter : array) {
+        if ((iter >> iIndex)%2 == 1) {
+            iNum1 ^= iter;
+        }
+        else {
+            iNum2 ^= iter;
+        }
+    }
+    std::vector<int> result;
+    if (iNum1 > iNum2) {
+        int temp = iNum1;
+        iNum1 = iNum2;
+        iNum2 = temp;
+    }
+    result.push_back(iNum1);
+    result.push_back(iNum2);
+    return result;
 }
 
+// 输出所有和为S的连续正数序列。序列内按照从小至大的顺序，序列间按照开始数字从小到大的顺序
 std::vector<std::vector<int> > FindContinuousSequence(int sum) {
     std::vector<std::vector<int>> rResult; 
     int mid = (sum+1)/2;
@@ -919,6 +948,119 @@ std::vector<std::vector<int> > FindContinuousSequence(int sum) {
     return rResult;
 }
 
+// 输入一个递增排序的数组和一个数字S，在数组中查找两个数，使得他们的和正好是S，如果有多对数字的和等于S，输出两个数的乘积最小的
+std::vector<int> FindNumbersWithSum(std::vector<int> array,int sum) {
+    std::vector<int> result;
+    int iStart = 0;
+    int iEnd = array.size() - 1;
+    while(iStart < iEnd) {
+        if (array[iStart] + array[iEnd] < sum) {
+            iStart++;
+        }
+        else if (array[iStart] + array[iEnd] > sum) {
+            iEnd--;
+        }
+        else {
+            result.push_back(array[iStart]);
+            result.push_back(array[iEnd]);
+            iStart++;
+            iEnd--;
+        }
+    }
+    return result;
+}
+
+// 汇编语言中有一种移位指令叫做循环左移（ROL），现在有个简单的任务，就是用字符串模拟这个指令的运算结果。
+// 对于一个给定的字符序列S，请你把其循环左移K位后的序列输出。例如，字符序列S=”abcXYZdef”,要求输出循环左移3位后的结果，即“XYZdefabc”。是不是很简单？OK，搞定它
+std::string LeftRotateString(std::string str, int n) {
+    std::string result(str);
+    int len = str.size();
+    for (int i = 0; i < len; ++i) {
+        int index = i - n + len;
+        result[index%len] = str[i];
+    } 
+    return result;
+}
+
+std::string ReverseSentence(std::string str) {
+    std::string result; 
+    std::string word;
+    for (int i = str.size() - 1; i >= 0; --i) {
+        if (str[i] == ' '){
+            result += word + str[i];
+            word.clear();
+        }
+        else {
+            word = str[i] + word;
+        }
+    }
+    result += word;
+    printf("%s\n", result);
+    return result;
+}
+
+// 扑克牌顺子
+bool IsContinuous(std::vector<int> numbers ) {
+    std::vector<int> flag(14, 0);
+    int min = 14;
+    int max = -1;
+    for(auto iter : numbers) {
+        if (iter != 0 && iter < min) {
+            min = iter;
+        }
+        if (iter != 0 && iter > max) {
+            max = iter;
+        }
+        if (iter >= 14 || iter < 0) {
+            return false;
+        }
+        flag[iter]++;
+    }
+    if (max - min > 4) {
+        return false;
+    }
+    int count = 1;
+    for (int i = min; i < max; ++i) {
+        if (flag[i] > 0) {
+            count++;
+        }
+    }
+    if (count + flag[0] == 5) {
+        return true;
+    }
+    return false;
+}
+
+// 孩子们的游戏
+int LastRemaining_Solution(int n, int m) {
+    int *index = new int[n]; 
+    int count = 0;
+    int k = 0;
+    for (int i = 0; i < n; ++i) {
+        index[i] = 0;
+    }
+    while(count < n - 1) {
+        int mTemp = m;
+        while(true) {
+            if (index[k] == 0) {
+                mTemp--;
+                if (mTemp == 0) {
+                    index[k] = 1;
+                    count++;
+                    break;
+                }
+            }
+            k = (k + 1)%n;
+        }
+    }
+    for(int i = 0; i < n; ++i) {
+        if (index[i] == 0) {
+            return i;
+        }
+    }
+    return 0;
+}
+
 void test() {
     std::vector<int> vec;
     vec.push_back(1);
@@ -936,7 +1078,7 @@ void test() {
 
 int main()
 {
-    std::vector<int> input = {3,3,3,3,4,5};
+    std::vector<int> input = {0,0,0,7,0};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -989,8 +1131,12 @@ int main()
     // printf("%d\n", InversePairs(input));
     // MergeSort(input, 0, input.size()-1);
     // printf("%d\n", count);
-    printf("%d\n", GetNumberOfK(input, 3));
-
+    // printf("%d\n", GetNumberOfK(input, 3));
+    // FindNumsAppearOnce(input);
+    // LeftRotateString("abcXYZdef", 3);
+    // ReverseSentence("I am a student.");
+    // printf("%d\n", IsContinuous(input));
+    printf("%d\n", LastRemaining_Solution(5, 3));
     for (auto iter : input) {
         printf("%d ", iter);
     }
