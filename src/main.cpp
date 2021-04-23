@@ -1061,6 +1061,86 @@ int LastRemaining_Solution(int n, int m) {
     return 0;
 }
 
+int Sum_Solution(int n) {
+    int ret = n;        
+    ret&&(ret += Sum_Solution(n - 1));
+    return ret;
+}
+
+// 不用加减乘除做加法
+int Add(int num1, int num2) {
+    int tempNum1 = num1^num2;
+    int tempNum2 = (num1&num2) << 1;
+    while((tempNum2&tempNum1) > 0) {
+        int temp = tempNum1;
+        tempNum1 = tempNum2^tempNum1;
+        tempNum2 = (temp&tempNum2) << 1;
+    }
+    return tempNum1^tempNum2;
+}
+
+// 字符串转数字
+int StrToInt(std::string str) {
+    int sum = 0;
+    int len = str.size();
+    int start = 0;
+    int k = 1;
+    bool flag = false;
+    if (str[0] >= '0' && str[0] <= '9'){
+        flag = true;
+    }
+    else if (str[0] == '-') {
+        flag = false;
+        start = 1;
+    }
+    else if (str[0] == '+') {
+        flag = true;
+        start = 1;
+    }
+    else {
+        return 0;
+    }
+    for (int i = len - 1; i >= start; --i) {
+        if (str[i] >= '0' && str[i] <= '9') {
+            sum += (str[i] - '0') * k; 
+        }
+        else {
+            return 0;
+        }
+        k = k*10;
+    } 
+    // printf("%d\n", sum);
+    if (flag == false) {
+        sum = 0 - sum;
+    }
+    return sum;
+}
+
+int duplicate(std::vector<int>& numbers) {
+    // std::vector<int> nCopy(numbers.size(), 0);
+    // for (auto iter : numbers) {
+    //     nCopy[iter]++;
+    //     if(nCopy[iter] > 1) {
+    //         return iter;
+    //     }
+    // }
+    // return -1;
+    for (int i = 0; i < numbers.size(); ++i) {
+        if (numbers[i] == i) {
+            continue;
+        }
+        if (numbers[numbers[i]] != numbers[i]) {
+            int temp = numbers[numbers[i]];
+             numbers[numbers[i]] = numbers[i];
+            numbers[i] = temp;
+            --i;
+        }
+        else {
+            return numbers[i];
+        }
+    }
+    return -1;
+}
 void test() {
     std::vector<int> vec;
     vec.push_back(1);
@@ -1078,7 +1158,7 @@ void test() {
 
 int main()
 {
-    std::vector<int> input = {0,0,0,7,0};
+    std::vector<int> input = {1,2,3,4,5,0};
     // std::vector<int> arra = {1,2,3,4};
     // auto ret = reOrderArray(arra);
     // for (auto iter : ret) {
@@ -1136,7 +1216,10 @@ int main()
     // LeftRotateString("abcXYZdef", 3);
     // ReverseSentence("I am a student.");
     // printf("%d\n", IsContinuous(input));
-    printf("%d\n", LastRemaining_Solution(5, 3));
+    // printf("%d\n", LastRemaining_Solution(5, 3));
+    // std::cout << Add(-5, 7) << std::endl;
+    // StrToInt("+2147483647");
+    printf("%d\n", duplicate(input));
     for (auto iter : input) {
         printf("%d ", iter);
     }
